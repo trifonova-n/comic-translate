@@ -1,1 +1,4 @@
-pytorch
+torch
+torchvision
+fastai
+jupyter
