@@ -2,3 +2,6 @@ torch
 torchvision
 fastai
 jupyter
+opencv-python
+opencv-contrib-python
+scikit-image
