@@ -1,9 +1,16 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 
-def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='left'):
+def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='left', contour=0, contour_color=255):
     justify_last_line = False
     x, y = pos
+    if contour > 0:
+        mask = Image.new("L", draw.im.size, 0)
+        mask_draw = ImageDraw.Draw(mask)
+        multiline_text(mask_draw, pos, text, box_width=box_width, font=font, color=255, place=place, contour=0)
+        mask = mask.filter(ImageFilter.MaxFilter(contour*2 + 1))
+        draw.bitmap((0, 0), mask, contour_color)
+
     lines = []
     line = []
     words = text.split()
@@ -51,8 +58,25 @@ def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='lef
             write_text(draw, (last_word_x, height), words[-1], font=font, color=color)
 
 
-def write_text(draw, pos, text, font, color=(0, 0, 0)):
+def write_text(draw, pos, text, font, color=(0, 0, 0), contour=0, contour_color=255):
     x, y = pos
+
+    if contour > 0:
+        mask = Image.new("L", draw.im.size, 0)
+        mask_draw = ImageDraw.Draw(mask)
+        write_text(mask_draw, pos, text, font=font, color=255, contour=0)
+        mask = mask.filter(ImageFilter.MaxFilter(contour))
+        draw.bitmap((0, 0), mask, contour_color)
+
     text_size = font.getsize(text)
     draw.text((x, y), text, font=font, fill=color)
     return text_size
+
+
+def write_contour(draw, pos, text, font, color=(0, 0, 0), contour_color=255):
+    mask = Image.new("L", draw.im.size, 0)
+    mask_draw = ImageDraw.Draw(mask)
+    write_text(mask_draw, pos, text, font, 255)
+    mask = mask.filter(ImageFilter.MaxFilter(5))
+    draw.bitmap((0, 0), mask, contour_color)
+    write_text(draw, pos, text, font, color)
