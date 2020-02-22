@@ -64,7 +64,7 @@ def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='lef
     return w, h
 
 
-def write_text(draw, pos, text, font, color=(0, 0, 0), contour=0, contour_color=255):
+def write_text(draw, pos, text, font, color=0, contour=0, contour_color=255):
     x, y = pos
 
     if contour > 0:
@@ -79,7 +79,7 @@ def write_text(draw, pos, text, font, color=(0, 0, 0), contour=0, contour_color=
     return text_size
 
 
-def write_contour(draw, pos, text, font, color=(0, 0, 0), contour_color=255):
+def write_contour(draw, pos, text, font, color=0, contour_color=255):
     mask = Image.new("L", draw.im.size, 0)
     mask_draw = ImageDraw.Draw(mask)
     write_text(mask_draw, pos, text, font, 255)
