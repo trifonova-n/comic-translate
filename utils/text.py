@@ -11,6 +11,7 @@ def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='lef
         mask = mask.filter(ImageFilter.MaxFilter(contour*2 + 1))
         draw.bitmap((0, 0), mask, contour_color)
 
+    h, w = 0, 0
     lines = []
     line = []
     words = text.split()
@@ -21,10 +22,14 @@ def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='lef
         if size[0] <= box_width:
             line.append(word)
         else:
+            h += text_height
+            w = max(w, size[0])
             lines.append(line)
             line = [word]
     if line:
         lines.append(line)
+        h += text_height
+        w = max(w, size[0])
     lines = [' '.join(line) for line in lines if line]
     height = y
     for index, line in enumerate(lines):
@@ -56,6 +61,7 @@ def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='lef
             last_word_size = font.getsize(words[-1])
             last_word_x = x + box_width - last_word_size[0]
             write_text(draw, (last_word_x, height), words[-1], font=font, color=color)
+    return w, h
 
 
 def write_text(draw, pos, text, font, color=(0, 0, 0), contour=0, contour_color=255):
