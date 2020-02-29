@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 
-def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='left', contour=0, contour_color=255):
+def multiline_text(draw, pos, text, box_width, font, color=0, place='left', contour=0, contour_color=255):
     justify_last_line = False
     x, y = pos
     if contour > 0:
@@ -9,7 +9,7 @@ def multiline_text(draw, pos, text, box_width, font, color=(0, 0, 0), place='lef
         mask_draw = ImageDraw.Draw(mask)
         multiline_text(mask_draw, pos, text, box_width=box_width, font=font, color=255, place=place, contour=0)
         mask = mask.filter(ImageFilter.MaxFilter(contour*2 + 1))
-        draw.bitmap((0, 0), mask, contour_color)
+        draw.bitmap((0, 0), mask, fill=contour_color)
 
     h, w = 0, 0
     lines = []
@@ -84,5 +84,5 @@ def write_contour(draw, pos, text, font, color=0, contour_color=255):
     mask_draw = ImageDraw.Draw(mask)
     write_text(mask_draw, pos, text, font, 255)
     mask = mask.filter(ImageFilter.MaxFilter(5))
-    draw.bitmap((0, 0), mask, contour_color)
+    draw.bitmap((0, 0), mask, fill=contour_color)
     write_text(draw, pos, text, font, color)

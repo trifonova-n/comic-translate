@@ -23,10 +23,11 @@ class TextGenerator:
         x = self.rg.integers(0, image.size[0] - box_width)
         y = self.rg.integers(0, image.size[1]*0.8)
         contour = self.rg.choice([0, 1, 2, 3])
-        w, h = multiline_text(draw, (x, y), text, box_width, font=font, color=0, contour=contour)
+        w, h = multiline_text(draw, (x, y), text, box_width, font=font, color='rgb(0, 0, 0)',
+                              contour=contour, contour_color='rgb(255, 255, 255)')
         if generate_mask:
             mask = Image.new("L", draw.im.size, 0)
             mask_draw = ImageDraw.Draw(mask)
-            multiline_text(mask_draw, (x, y), text, box_width, font=font, color=0, contour=contour)
-            return (w, h), mask
-        return w, h
+            multiline_text(mask_draw, (x, y), text, box_width, font=font, color=255, contour=contour)
+            return (x, y, w, h), mask
+        return x, y, w, h
