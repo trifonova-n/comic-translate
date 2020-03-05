@@ -5,3 +5,5 @@ jupyter
 opencv-python
 opencv-contrib-python
 scikit-image
+Cython
+pycocotools
