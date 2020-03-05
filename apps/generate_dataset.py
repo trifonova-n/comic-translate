@@ -7,6 +7,19 @@ from pathlib import Path
 from dataset.dataset_generator import TextGenerator
 
 
+def check_intersection(box1, box2):
+    x1, y1, w1, h1 = box1
+    x2, y2, w2, h2 = box2
+    return (x1 <= x2 <= x1 + w1 or x2 <= x1 <= x2 + w2) and (y1 <= y2 <= y1 + h1 or y2 <= y1 <= y2 + h2)
+
+
+def check_intersections(boxes, box):
+    for b in boxes:
+        if check_intersection(b, box):
+            return True
+    return False
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='align data from different scans')
     parser.add_argument('image_dir', help='images to be aligned')
@@ -34,8 +47,17 @@ if __name__ == '__main__':
             continue
         num_texts = rg.integers(1, 10)
         name = '_'.join(image_path.relative_to(image_dir).parts[:-1]) + '_' + image_path.stem
-        for i in range(num_texts):
+        boxes = []
+        i = 0
+        while i < num_texts:
+            prev_image = image.copy()
             pos, mask = text_generator.generate(image, generate_mask=True)
+            if check_intersections(boxes, pos):
+                image = prev_image
+                continue
+            boxes.append(pos)
+            i += 1
+
             block_file.write(f'{name}, {pos[0]}, {pos[1]}, {pos[2]}, {pos[3]}\n')
             mask.save(mask_dir / f'{name}_{i}.png')
         image.save(out_image_dir / f'{name}.png')
