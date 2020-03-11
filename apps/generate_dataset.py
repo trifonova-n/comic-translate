@@ -34,7 +34,7 @@ if __name__ == '__main__':
     mask_dir = out_dir / 'masks'
     mask_dir.mkdir(exist_ok=True, parents=True)
     out_image_dir.mkdir(exist_ok=True, parents=True)
-    blocks_file_path = out_dir / 'blocks.txt'
+    blocks_file_path = out_dir / 'boxes.txt'
 
     rg = Generator(PCG64())
     text_generator = TextGenerator(args.text_file)

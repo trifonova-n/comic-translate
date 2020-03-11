@@ -12,9 +12,9 @@ class ImageTextDataset(torch.utils.data.Dataset):
         self.transforms = transforms
         # load all image files, sorting them to
         # ensure that they are aligned
-        self.imgs = list(sorted((root / "images").iterdir()))
-        self.masks = list(sorted((root / "masks").iterdir()))
-        self.boxes = np.loadtxt(str(root / 'boxes.txt'))
+        self.imgs = list(sorted((self.root / "images").iterdir()))
+        self.masks = list(sorted((self.root / "masks").iterdir()))
+        #self.boxes = np.loadtxt(str(self.root / 'boxes.txt'))
 
     def __getitem__(self, idx):
         # load images ad masks
