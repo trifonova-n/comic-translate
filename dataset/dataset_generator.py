@@ -13,7 +13,7 @@ class TextGenerator:
         self.rg = Generator(PCG64())
         self.font_files = list((Path(__file__).parent.absolute() / '../fonts').iterdir())
 
-    def generate(self, image, generate_mask=False):
+    def generate(self, image, generate_mask=True, mask=None, mask_color=255):
         font_size = self.rg.integers(self.min_font_size, self.max_font_size, endpoint=True)
         font_file = self.rg.choice(self.font_files)
         font = ImageFont.truetype(str(font_file), size=font_size)
@@ -25,9 +25,11 @@ class TextGenerator:
         contour = self.rg.choice([0, 1, 2, 3])
         w, h = multiline_text(draw, (x, y), text, box_width, font=font, color='rgb(0, 0, 0)',
                               contour=contour, contour_color='rgb(255, 255, 255)')
+
         if generate_mask:
-            mask = Image.new("L", draw.im.size, 0)
+            if mask is None:
+                mask = Image.new("L", draw.im.size, 0)
             mask_draw = ImageDraw.Draw(mask)
-            multiline_text(mask_draw, (x, y), text, box_width, font=font, color=255, contour=contour)
+            multiline_text(mask_draw, (x, y), text, box_width, font=font, color=mask_color, contour=contour, contour_color=mask_color)
             return (x, y, w, h), mask
         return x, y, w, h
