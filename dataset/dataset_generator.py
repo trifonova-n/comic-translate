@@ -6,7 +6,7 @@ from utils.text import multiline_text, write_text
 
 class TextGenerator:
     def __init__(self, text_file):
-        self.text_list = Path(text_file).open().readlines()
+        self.text_list = Path(text_file).open('r+', encoding="utf-8").readlines()
         self.font_files = []
         self.min_font_size = 10
         self.max_font_size = 60

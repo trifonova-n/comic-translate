@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 from skimage import io
 from pathlib import Path
 from dataset.dataset_generator import TextGenerator
+import json
 
 
 def check_intersection(box1, box2):
@@ -38,8 +39,8 @@ if __name__ == '__main__':
 
     rg = Generator(PCG64())
     text_generator = TextGenerator(args.text_file)
-    block_file = blocks_file_path.open('w')
 
+    boxes = {}
     for image_path in image_dir.glob('**/*'):
         try:
             image = Image.open(image_path).convert('RGB')
@@ -47,25 +48,25 @@ if __name__ == '__main__':
             continue
         num_texts = rg.integers(1, 10)
         name = '_'.join(image_path.relative_to(image_dir).parts[:-1]) + '_' + image_path.stem
-        boxes = []
         text_number = 0
         i = 0
-        mask = Image.new("L", image.size, 0)
         print(image_path)
+        curr_mask_dir = mask_dir / name
+        curr_mask_dir.mkdir(exist_ok=True)
+        boxes[name] = []
         while i < 20 and text_number < num_texts:
             i += 1
             prev_image = image.copy()
-            prev_mask = mask.copy()
-            pos, mask = text_generator.generate(image, generate_mask=True, mask=mask, mask_color=text_number + 1)
+            pos, mask = text_generator.generate(image, generate_mask=True, mask_color=255)
 
             if check_intersections(boxes, pos):
                 image = prev_image
-                mask = prev_mask
                 print('failed attempt, box number ', text_number)
                 continue
-            boxes.append(pos)
+            mask.save(curr_mask_dir / f'{text_number}.png', format='PNG', compress_level=0)
+            boxes[name].append(pos)
             text_number += 1
 
-            block_file.write(f'{name}, {pos[0]}, {pos[1]}, {pos[2]}, {pos[3]}\n')
-        mask.save(mask_dir / f'{name}.png')
-        image.save(out_image_dir / f'{name}.png')
+        with blocks_file_path.open('w') as block_file:
+            json.dump(boxes, block_file, indent=4)
+        image.save(out_image_dir / f'{name}.png', format='PNG')
