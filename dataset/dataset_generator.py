@@ -20,8 +20,8 @@ class TextGenerator:
         draw = ImageDraw.Draw(image)
         text = self.rg.choice(self.text_list)
         box_width = self.rg.integers(image.size[0]*0.1, image.size[0]*0.8)
-        x = self.rg.integers(0, image.size[0] - box_width)
-        y = self.rg.integers(0, image.size[1]*0.8)
+        x = int(self.rg.integers(0, image.size[0] - box_width))
+        y = int(self.rg.integers(0, image.size[1]*0.8))
         contour = self.rg.choice([0, 1, 2, 3])
         w, h = multiline_text(draw, (x, y), text, box_width, font=font, color='rgb(0, 0, 0)',
                               contour=contour, contour_color='rgb(255, 255, 255)')

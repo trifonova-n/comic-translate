@@ -59,11 +59,13 @@ if __name__ == '__main__':
             prev_image = image.copy()
             pos, mask = text_generator.generate(image, generate_mask=True, mask_color=255)
 
-            if check_intersections(boxes, pos):
+            if check_intersections(boxes[name], pos) or \
+                    pos[1] + pos[3] >= image.size[1] or \
+                    pos[0] + pos[2] >= image.size[0]:
                 image = prev_image
                 print('failed attempt, box number ', text_number)
                 continue
-            mask.save(curr_mask_dir / f'{text_number}.png', format='PNG', compress_level=0)
+            mask.save(curr_mask_dir / f'{text_number:03}.png', format='PNG', compress_level=0)
             boxes[name].append(pos)
             text_number += 1
 

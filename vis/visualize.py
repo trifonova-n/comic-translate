@@ -26,14 +26,15 @@ def image2np(image:Tensor)->np.ndarray:
 
 def box2wh(box):
     xmin, ymin, xmax, ymax = box
-    return xmin, ymax, xmax - xmin, ymax - ymin
+    return xmin, ymin, xmax - xmin, ymax - ymin
 
 
 def draw_box(ax, box):
     x, y, w, h = box2wh(box)
-    rect = plt.Rectangle((x, y), w, h, fill=False, edgecolor='white', lw=2)
+    rect = plt.Rectangle((x, y), w, h, fill=False, edgecolor='yellow', lw=1)
+
     patch = ax.add_patch(rect)
-    outline(patch, 4)
+    outline(patch, 3)
 
 
 def draw_annotation(img, ann, show_masks=False, ax=None, figsize:tuple=(3,3)):
