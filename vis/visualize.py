@@ -40,5 +40,6 @@ def draw_box(ax, box):
 def draw_annotation(img, ann, show_masks=False, ax=None, figsize:tuple=(3,3)):
     if ax is None: fig, ax = plt.subplots(figsize=figsize)
     show_image(img, ax=ax, figsize=figsize)
-    for box in ann['boxes']:
-        draw_box(ax, box)
+    for i, box in enumerate(ann['boxes']):
+        if 'scores' not in ann or ann['scores'][i] > 0.00:
+            draw_box(ax, box)
