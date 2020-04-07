@@ -35,12 +35,12 @@ if __name__ == '__main__':
     mask_dir = out_dir / 'masks'
     mask_dir.mkdir(exist_ok=True, parents=True)
     out_image_dir.mkdir(exist_ok=True, parents=True)
-    blocks_file_path = out_dir / 'boxes.txt'
+    bbox_file_path = out_dir / 'bboxes.txt'
 
     rg = Generator(PCG64())
     text_generator = TextGenerator(args.text_file)
 
-    boxes = {}
+    bboxes = {}
     for image_path in image_dir.glob('**/*'):
         try:
             image = Image.open(image_path).convert('RGB')
@@ -53,22 +53,22 @@ if __name__ == '__main__':
         print(image_path)
         curr_mask_dir = mask_dir / name
         curr_mask_dir.mkdir(exist_ok=True)
-        boxes[name] = []
-        while i < 20 and text_number < num_texts:
+        bboxes[name] = []
+        while i < 10 and text_number < num_texts:
             i += 1
             prev_image = image.copy()
             pos, mask = text_generator.generate(image, generate_mask=True, mask_color=255)
 
-            if check_intersections(boxes[name], pos) or \
+            if check_intersections(bboxes[name], pos) or \
                     pos[1] + pos[3] >= image.size[1] or \
                     pos[0] + pos[2] >= image.size[0]:
                 image = prev_image
                 print('failed attempt, box number ', text_number)
                 continue
             mask.save(curr_mask_dir / f'{text_number:03}.png', format='PNG', compress_level=0)
-            boxes[name].append(pos)
+            bboxes[name].append({'left': pos[0], 'top': pos[1], 'width': pos[2], 'height': pos[3], 'label': 'text'})
             text_number += 1
 
-        with blocks_file_path.open('w') as block_file:
-            json.dump(boxes, block_file, indent=4)
+        with bbox_file_path.open('w') as block_file:
+            json.dump(bboxes, block_file, indent=4)
         image.save(out_image_dir / f'{name}.png', format='PNG')
