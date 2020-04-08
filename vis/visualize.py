@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import matplotlib.patheffects as path_effects
 from fastai.vision import *
 
@@ -29,18 +30,35 @@ def box2wh(box):
     return xmin, ymin, xmax - xmin, ymax - ymin
 
 
-def draw_box(ax, box, label):
+def draw_box(ax, box, color):
     x, y, w, h = box2wh(box)
-    color_map = {1: 'yellow', 2: 'red', 3: 'blue'}
-    rect = plt.Rectangle((x, y), w, h, fill=False, edgecolor=color_map[label], lw=1)
+    rect = plt.Rectangle((x, y), w, h, fill=False, edgecolor=color, lw=1)
 
     patch = ax.add_patch(rect)
     outline(patch, 3)
 
 
+def draw_mask(ax, mask, color):
+    alpha = 0.5
+    threshold = 0.3
+    my_cmap = cm.jet
+    my_cmap.set_under('k', alpha=0)
+    my_cmap.set_over(color, alpha=alpha)
+    ax.imshow(mask.data.cpu()[0,:,:], cmap=my_cmap, clim=[threshold, threshold + 0.0001])
+
+
 def draw_annotation(img, ann, show_masks=False, ax=None, figsize:tuple=(3,3)):
+    color_map = {1: (1, 1, 0), 2: (1, 0, 0), 3: (0, 0, 1)}
     if ax is None: fig, ax = plt.subplots(figsize=figsize)
     show_image(img, ax=ax, figsize=figsize)
     for i, box in enumerate(ann['boxes']):
-        if 'scores' not in ann or ann['scores'][i] > 0.2:
-            draw_box(ax, box, int(ann['labels'][i]))
+        if 'scores' not in ann or ann['scores'][i] > 0.0:
+            color = color_map[int(ann['labels'][i])]
+            draw_box(ax, box, color)
+
+    if 'masks' in ann and show_masks:
+        for i, mask in enumerate(ann['masks']):
+            color = color_map[int(ann['labels'][i])]
+            draw_mask(ax, mask, color)
+
+

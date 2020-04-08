@@ -16,7 +16,7 @@ class ImageTextDataset(torch.utils.data.Dataset):
         self.masks_dir = self.root / "masks"
         self.imgs = list(sorted((self.root / "images").iterdir()))
         #self.masks = list(sorted((self.root / "masks").iterdir()))
-        with (self.root / 'boxes.txt').open() as f:
+        with (self.root / 'bboxes.txt').open() as f:
             self.boxes = json.load(f)
 
     def __getitem__(self, idx):
