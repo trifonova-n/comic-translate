@@ -109,7 +109,10 @@ class ImageBboxDataset(torch.utils.data.Dataset):
         # there is only one class
         labels = torch.as_tensor(labels, dtype=torch.int64)
         image_id = torch.tensor([idx])
-        area = (bboxes[:, 3] - bboxes[:, 1]) * (bboxes[:, 2] - bboxes[:, 0])
+        if len(bboxes.shape) == 2:
+            area = (bboxes[:, 3] - bboxes[:, 1]) * (bboxes[:, 2] - bboxes[:, 0])
+        else:
+            area = torch.as_tensor([], dtype=torch.float32)
         # suppose all instances are not crowd
         iscrowd = torch.zeros((len(labels),), dtype=torch.int64)
 

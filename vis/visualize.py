@@ -29,9 +29,10 @@ def box2wh(box):
     return xmin, ymin, xmax - xmin, ymax - ymin
 
 
-def draw_box(ax, box):
+def draw_box(ax, box, label):
     x, y, w, h = box2wh(box)
-    rect = plt.Rectangle((x, y), w, h, fill=False, edgecolor='yellow', lw=1)
+    color_map = {1: 'yellow', 2: 'red', 3: 'blue'}
+    rect = plt.Rectangle((x, y), w, h, fill=False, edgecolor=color_map[label], lw=1)
 
     patch = ax.add_patch(rect)
     outline(patch, 3)
@@ -41,5 +42,5 @@ def draw_annotation(img, ann, show_masks=False, ax=None, figsize:tuple=(3,3)):
     if ax is None: fig, ax = plt.subplots(figsize=figsize)
     show_image(img, ax=ax, figsize=figsize)
     for i, box in enumerate(ann['boxes']):
-        if 'scores' not in ann or ann['scores'][i] > 0.00:
-            draw_box(ax, box)
+        if 'scores' not in ann or ann['scores'][i] > 0.2:
+            draw_box(ax, box, int(ann['labels'][i]))

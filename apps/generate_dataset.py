@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 from skimage import io
 from pathlib import Path
 from dataset.dataset_generator import TextGenerator
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 import json
 
 
