@@ -1,11 +1,8 @@
-import numpy as np
 import argparse
 from numpy.random import Generator, PCG64
-from PIL import Image, ImageDraw, ImageFont
-from skimage import io
+from PIL import Image
 from pathlib import Path
-from dataset.dataset_generator import TextGenerator
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from comic.dataset.dataset_generator import TextGenerator
 import json
 
 

@@ -1,2 +1,0 @@
-from vis.visualize import *
-

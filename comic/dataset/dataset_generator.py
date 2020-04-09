@@ -1,7 +1,7 @@
 from pathlib import Path
 from numpy.random import Generator, PCG64
 from PIL import Image, ImageDraw, ImageFont
-from utils.text import multiline_text, write_text
+from comic.utils.text import multiline_text
 
 
 class TextGenerator:
