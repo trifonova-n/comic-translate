@@ -2,6 +2,7 @@ from pathlib import Path
 from numpy.random import Generator, PCG64
 from PIL import Image, ImageDraw, ImageFont
 from comic.utils.text import multiline_text
+import comic.config as config
 
 
 class TextGenerator:
@@ -11,7 +12,7 @@ class TextGenerator:
         self.min_font_size = 14
         self.max_font_size = 60
         self.rg = Generator(PCG64())
-        self.font_files = list((Path(__file__).parent.absolute() / '../fonts/fancy_fonts').iterdir())
+        self.font_files = list((config.fonts_dir / 'fancy_fonts').iterdir())
 
     def generate(self, image, generate_mask=True, mask=None, mask_color=255):
         font_size = self.rg.integers(self.min_font_size, self.max_font_size, endpoint=True)
