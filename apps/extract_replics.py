@@ -13,4 +13,9 @@ if __name__ == '__main__':
     for line in f:
         match = pattern.search(line)
         if match:
-            print(match.group(1))
+            replic = match.group(1)
+            if len(replic) > 40:
+                for s in re.split(r'[;.?!]\s+', replic):
+                    print(s)
+            else:
+                print(replic)

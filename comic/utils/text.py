@@ -1,13 +1,14 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import string
 
-
-def multiline_text(draw, pos, text, box_width, font, color=0, place='left', contour=0, contour_color=255):
+def multiline_text(draw, pos, text, box_width, box_height, font, color=0, place='left', contour=0, contour_color=255, spacing=0):
     justify_last_line = False
     x, y = pos
     if contour > 0:
         mask = Image.new("L", draw.im.size, 0)
         mask_draw = ImageDraw.Draw(mask)
-        multiline_text(mask_draw, pos, text, box_width=box_width, font=font, color=255, place=place, contour=0)
+        multiline_text(mask_draw, pos, text, box_width=box_width, box_height=box_height, font=font,
+                       color=255, place=place, contour=0, spacing=spacing)
         mask = mask.filter(ImageFilter.MaxFilter(contour*2 + 1))
         draw.bitmap((0, 0), mask, fill=contour_color)
 
@@ -15,25 +16,25 @@ def multiline_text(draw, pos, text, box_width, font, color=0, place='left', cont
     lines = []
     line = []
     words = text.split()
+    line_spacing = font.getsize(string.ascii_letters)[1] + spacing
     for word in words:
         new_line = ' '.join(line + [word])
         size = font.getsize(new_line)
-        text_height = size[1]
         if size[0] <= box_width:
             line.append(word)
         else:
-            h += text_height
+            h += line_spacing
             w = max(w, size[0])
             lines.append(line)
             line = [word]
     if line:
         lines.append(line)
-        h += text_height
+        h += line_spacing
         w = max(w, size[0])
     lines = [' '.join(line) for line in lines if line]
-    height = y
+    height = y + box_height // 2 - h // 2
+    y = height
     for index, line in enumerate(lines):
-        height += text_height
         if place == 'left':
             write_text(draw, (x, height), line, font=font, color=color)
         elif place == 'right':
@@ -61,7 +62,8 @@ def multiline_text(draw, pos, text, box_width, font, color=0, place='left', cont
             last_word_size = font.getsize(words[-1])
             last_word_x = x + box_width - last_word_size[0]
             write_text(draw, (last_word_x, height), words[-1], font=font, color=color)
-    return w, h
+        height += line_spacing
+    return x, y, w, h
 
 
 def write_text(draw, pos, text, font, color=0, contour=0, contour_color=255):

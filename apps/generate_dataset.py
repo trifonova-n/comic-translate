@@ -6,7 +6,7 @@ from pathlib import Path
 from comic.dataset.dataset_generator import TextGenerator
 from comic.models.rcnn import get_model_box_detector, load_model
 from torchvision.transforms import functional as F
-from comic.dataset import ImageBboxDataset
+from comic.utils.bbox import check_intersection, get_avg_color
 from comic.vis.visualize import box2wh
 import json
 
@@ -14,36 +14,12 @@ bubble_label = 1
 text_label = 2
 
 
-def check_intersection(box1, box2):
-    x1, y1, w1, h1 = box1
-    x2, y2, w2, h2 = box2
-    return ((x1 <= x2 <= x1 + w1) or (x2 <= x1 <= x2 + w2)) and ((y1 <= y2 <= y1 + h1) or (y2 <= y1 <= y2 + h2))
-
 
 def check_intersections(boxes, box):
     for b in boxes:
         if check_intersection((b['left'], b['top'], b['width'], b['height']), box):
             return True
     return False
-
-
-def clip(val, low, high):
-    return max(low, min(high, val))
-
-
-def get_avg_color(img, box):
-    colors = []
-    dx = 5
-    box = [clip(box[0] + dx, 0, img.width - 1),
-           clip(box[1] + dx, 0, img.height - 1),
-           clip(box[2] - dx, 0, img.width - 1),
-           clip(box[3] - dx, 0, img.height - 1)]
-    colors.append(img.getpixel((box[0], box[1])))
-    colors.append(img.getpixel((box[2], box[3])))
-    colors.append(img.getpixel((box[0], box[3])))
-    colors.append(img.getpixel((box[2], box[1])))
-    color = np.median(colors, axis=0).astype(int)
-    return tuple(color)
 
 
 
@@ -82,13 +58,12 @@ if __name__ == '__main__':
         num_texts = rg.integers(1, 10)
         name = '_'.join(image_path.relative_to(image_dir).parts[:-1]) + '_' + image_path.stem
         text_number = 0
-        i = 0
         print(image_path)
         curr_mask_dir = mask_dir / name
         curr_mask_dir.mkdir(exist_ok=True)
         bboxes[name] = []
         bubbles = []
-
+        old_texts = []
         if args.clean:
             ann = box_detector(F.to_tensor(image)[None, ...])[0]
             for i, box in enumerate(ann['boxes']):
@@ -98,17 +73,36 @@ if __name__ == '__main__':
                     draw = ImageDraw.Draw(image)
                     draw.rectangle(box, fill=get_avg_color(image, box))
                 else:
+                    pass
                     pos = box2wh(box)
-                    bboxes[name].append({'left': pos[0], 'top': pos[1], 'width': pos[2], 'height': pos[3],
-                                         'label': 'text', 'mask': None})
-        while i < 10 and text_number < num_texts:
-            i += 1
+                    old_texts.append({'left': pos[0], 'top': pos[1], 'width': pos[2], 'height': pos[3],
+                                      'label': 'text', 'mask': None})
+
+        for i in range(len(bubbles) + 10):
             prev_image = image.copy()
-            pos, mask = text_generator.generate(image, generate_mask=True, mask_color=255)
+            if i < len(bubbles):
+                x, y, w, h = bubbles[i]
+                fancy = False
+            else:
+                aspect = rg.uniform(0.3, 3)
+                w = rg.integers(image.size[0] * 0.05, image.size[0] * 0.25)
+                h = int(w / aspect)
+                x = int(rg.integers(0, image.width - w))
+                y = int(rg.integers(0, image.height * 0.8))
+                fancy = True
+            pos, mask = text_generator.generate(image, (x, y, w, h), fancy=fancy, generate_mask=True)
+            # if text is wider then the box, try short text
+            if pos[2] > w*1.3:
+                image = prev_image
+                prev_image = image.copy()
+                print('short text for box number ', text_number)
+                pos, mask = text_generator.generate(image, (x, y, w, h), fancy=fancy, short=True, generate_mask=True)
 
             if check_intersections(bboxes[name], pos) or \
                     pos[1] + pos[3] >= image.size[1] or \
-                    pos[0] + pos[2] >= image.size[0]:
+                    pos[0] + pos[2] >= image.size[0] or \
+                    (i >= len(bubbles) and check_intersections(old_texts, pos)):
+
                 image = prev_image
                 print('failed attempt, box number ', text_number)
                 continue
@@ -117,6 +111,11 @@ if __name__ == '__main__':
                                  'label': 'text', 'mask': text_number})
             text_number += 1
 
-        with bbox_file_path.open('w') as block_file:
-            json.dump(bboxes, block_file, indent=4)
+        for b in old_texts:
+            if not check_intersections(bboxes[name], (b['left'], b['top'], b['width'], b['height'])):
+                bboxes[name].append(b)
+
         image.save(out_image_dir / f'{name}.png', format='PNG')
+
+    with bbox_file_path.open('w') as block_file:
+        json.dump(bboxes, block_file, indent=4)
