@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import string
 
+
 def multiline_text(draw, pos, text, box_width, box_height, font, color=0, place='left', contour=0, contour_color=255, spacing=0):
     justify_last_line = False
     x, y = pos
@@ -22,28 +23,34 @@ def multiline_text(draw, pos, text, box_width, box_height, font, color=0, place=
         size = font.getsize(new_line)
         if size[0] <= box_width:
             line.append(word)
+            w = max(w, size[0])
         else:
             h += line_spacing
-            w = max(w, size[0])
             lines.append(line)
             line = [word]
     if line:
         lines.append(line)
         h += line_spacing
+        size = font.getsize(line[0])
         w = max(w, size[0])
     lines = [' '.join(line) for line in lines if line]
     height = y + box_height // 2 - h // 2
     y = height
+    x_min = x + w
     for index, line in enumerate(lines):
         if place == 'left':
             write_text(draw, (x, height), line, font=font, color=color)
         elif place == 'right':
             total_size = font.getsize(line)
             x_left = x + box_width - total_size[0]
+            if x_left < x_min:
+                x_min = x_left
             write_text(draw, (x_left, height), line, font=font, color=color)
         elif place == 'center':
             total_size = font.getsize(line)
             x_left = int(x + ((box_width - total_size[0]) / 2))
+            if x_left < x_min:
+                x_min = x_left
             write_text(draw, (x_left, height), line, font=font, color=color)
         elif place == 'justify':
             words = line.split()
@@ -63,7 +70,7 @@ def multiline_text(draw, pos, text, box_width, box_height, font, color=0, place=
             last_word_x = x + box_width - last_word_size[0]
             write_text(draw, (last_word_x, height), words[-1], font=font, color=color)
         height += line_spacing
-    return x, y, w, h
+    return x_min, y, w, h
 
 
 def write_text(draw, pos, text, font, color=0, contour=0, contour_color=255):
