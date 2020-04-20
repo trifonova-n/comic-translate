@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 from comic.utils.text import multiline_text
 import math
 import comic.config as config
-from comic.utils.bbox import get_avg_color
+from comic.utils.bbox import get_avg_color_wh
 import numpy as np
 
 
@@ -59,7 +59,7 @@ class TextGenerator:
             contour = 0
         if self.rg.random() > 0.5:
             text = text.upper()
-        bg_color = get_avg_color(image, (box[0], box[1], box[0] + box[2], box[1] + box[3]))
+        bg_color = get_avg_color_wh(image, (box[0], box[1], box[0] + box[2], box[1] + box[3]))
         if np.mean(bg_color) > 128:
             color = (0, 0, 0)
         else:

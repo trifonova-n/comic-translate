@@ -40,7 +40,7 @@ def draw_box(ax, box, color):
 
 def draw_mask(ax, mask, color):
     alpha = 0.5
-    threshold = 0.3
+    threshold = 0.05
     my_cmap = cm.jet
     my_cmap.set_under('k', alpha=0)
     my_cmap.set_over(color, alpha=alpha)
@@ -51,16 +51,18 @@ def draw_annotation(img, ann, show_masks=False, ax=None, figsize:tuple=(3,3)):
     color_map = {1: (1, 1, 0), 2: (1, 0, 0), 3: (0, 0, 1)}
     if ax is None: fig, ax = plt.subplots(figsize=figsize)
     show_image(img, ax=ax, figsize=figsize)
-    for i, box in enumerate(ann['boxes']):
-        if 'scores' not in ann or ann['scores'][i] > 0.05:
-            color = color_map[int(ann['labels'][i])]
-            draw_box(ax, box, color)
+    for i, (box, mask) in enumerate(zip(ann['boxes'], ann['masks'])):
+        color = color_map[int(ann['labels'][i])]
+        draw_box(ax, box, color)
+        if mask.ndim == 3:
+            mask = mask[0, :, :]
+        draw_mask(ax, mask, color)
 
-    if 'masks' in ann and show_masks:
-        for i, mask in enumerate(ann['masks']):
-            color = color_map[int(ann['labels'][i])]
-            if mask.ndim == 3:
-                mask = mask[0, :, :]
-            draw_mask(ax, mask, color)
+    # if 'masks' in ann and show_masks:
+    #     for i, mask in enumerate(ann['masks']):
+    #         color = color_map[int(ann['labels'][i])]
+    #         if mask.ndim == 3:
+    #             mask = mask[0, :, :]
+    #         draw_mask(ax, mask, color)
 
 

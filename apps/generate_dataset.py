@@ -6,7 +6,7 @@ from pathlib import Path
 from comic.dataset.dataset_generator import TextGenerator
 from comic.models.rcnn import get_model_box_detector, load_model
 from torchvision.transforms import functional as F
-from comic.utils.bbox import check_intersection, get_avg_color
+from comic.utils.bbox import check_intersection_wh, get_avg_color_wh
 from comic.vis.visualize import box2wh
 import json
 
@@ -16,7 +16,7 @@ text_label = 2
 
 def check_intersections(boxes, box):
     for b in boxes:
-        if check_intersection((b['left'], b['top'], b['width'], b['height']), box):
+        if check_intersection_wh((b['left'], b['top'], b['width'], b['height']), box):
             return True
     return False
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                 if ann['labels'][i] == bubble_label:
                     bubbles.append(box2wh(box))
                     draw = ImageDraw.Draw(image)
-                    draw.rectangle(box, fill=get_avg_color(image, box))
+                    draw.rectangle(box, fill=get_avg_color_wh(image, box))
                 else:
                     pos = box2wh(box)
                     old_texts.append({'left': pos[0], 'top': pos[1], 'width': pos[2], 'height': pos[3],
