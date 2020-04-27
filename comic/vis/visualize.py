@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.patheffects as path_effects
-from fastai.vision import *
+from torch import Tensor
+import numpy as np
 
 
 def show_image(img, ax:plt.Axes=None, figsize:tuple=(3,3), hide_axis:bool=True, cmap:str='viridis',
