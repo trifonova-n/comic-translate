@@ -5,9 +5,9 @@ from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import comic.config as config
 
 
-def get_model_instance_segmentation(num_classes, rpn_nms_thresh=0.05):
+def get_model_instance_segmentation(num_classes, rpn_nms_thresh=0.05, pretrained=True):
     # load an instance segmentation model pre-trained pre-trained on COCO
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True,
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=pretrained,
                                                                rpn_nms_thresh=rpn_nms_thresh)
 
     # get number of input features for the classifier
@@ -26,9 +26,9 @@ def get_model_instance_segmentation(num_classes, rpn_nms_thresh=0.05):
     return model
 
 
-def get_model_box_detector(num_classes, rpn_nms_thresh=0.05):
+def get_model_box_detector(num_classes, rpn_nms_thresh=0.05, pretrained=True):
     # load an instance segmentation model pre-trained pre-trained on COCO
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True,
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=pretrained,
                                                                  rpn_nms_thresh=rpn_nms_thresh)
 
     # get number of input features for the classifier
