@@ -18,7 +18,7 @@ deploy_gcfunction: $(gcf_files)
 	cp gcfunction/*.py deployed/
 	cp gcfunction/*.txt deployed/
 
-	gcloud functions deploy detect_text --source=./deployed --runtime=python37 --stage-bucket comic-translate \
+	gcloud functions deploy detect_text --allow-unauthenticated --source=./deployed --runtime=python37 --stage-bucket comic-translate \
 	--trigger-http --memory=2048
 	echo "" > $@
 
