@@ -1,11 +1,10 @@
+import matplotlib.pyplot as plt
+import torch
 from skimage.io import imsave
 
 from comic.models.rcnn import get_model_instance_segmentation
 from comic.utils.filter import filter_outputs
 from comic.vis import draw_annotation
-import torch
-import matplotlib.pyplot as plt
-from torch import functional as F
 
 
 def test_draw_annotations(datadir, data_path, nakaguma_image):
