@@ -7,7 +7,7 @@ from comic.utils.filter import filter_outputs
 from comic.vis import draw_annotation
 
 
-def test_draw_annotations(datadir, data_path, nakaguma_image):
+def test_text_detection(datadir, data_path, nakaguma_image):
     image = torch.FloatTensor(nakaguma_image) / 255
     image = image.transpose(0, 2)
     imsave(datadir / 'input.jpg', nakaguma_image)
