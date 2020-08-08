@@ -1,3 +1,5 @@
+from copy import copy
+
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.patheffects as path_effects
@@ -42,10 +44,10 @@ def draw_box(ax, box, color):
 def draw_mask(ax, mask, color):
     alpha = 0.5
     threshold = 0.05
-    my_cmap = cm.jet
+    my_cmap = copy(cm.jet)
     my_cmap.set_under('k', alpha=0)
     my_cmap.set_over(color, alpha=alpha)
-    ax.imshow(mask.data.cpu()[:,:], cmap=my_cmap, clim=[threshold, threshold + 0.0001])
+    ax.imshow(mask.data.cpu()[:, :], cmap=my_cmap, clim=[threshold, threshold + 0.0001])
 
 
 def draw_annotation(img, ann, show_masks=False, ax=None, figsize:tuple=(3,3)):
