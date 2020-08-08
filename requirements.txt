@@ -10,3 +10,4 @@ Cython
 pycocotools
 google-cloud-storage
 functions-framework==1.5.0
+pytest==6.0.1
