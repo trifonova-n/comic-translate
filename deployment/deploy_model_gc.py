@@ -1,7 +1,11 @@
-from google.cloud import storage
 import shutil
-import comic.config as config
 from pathlib import Path
+
+import sagemaker
+from sagemaker import get_execution_role
+from sagemaker.pytorch import PyTorchModel
+
+import comic.config as config
 
 
 def copy_sources(destination):
@@ -25,6 +29,7 @@ def copy_model(model_path):
     prefix = f'sagemaker/{model_path.stem}'
     model_artefact = sagemaker_session.upload_data(path=str(tar_path), bucket=bucket, key_prefix=prefix)
     return model_artefact
+
 
 def deploy():
     source = config.project_dir / 'deployment/source'

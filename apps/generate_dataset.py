@@ -1,14 +1,16 @@
 import argparse
-from numpy.random import Generator, PCG64
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+import json
 from pathlib import Path
+
+import numpy as np
+from PIL import Image, ImageDraw
+from numpy.random import Generator, PCG64
+from torchvision.transforms import functional as F
+
 from comic.dataset.dataset_generator import TextGenerator
 from comic.models.rcnn import get_model_box_detector, load_model
-from torchvision.transforms import functional as F
 from comic.utils.bbox import check_intersection_wh, get_avg_color_wh
 from comic.vis.visualize import box2wh
-import json
 
 bubble_label = 1
 text_label = 2

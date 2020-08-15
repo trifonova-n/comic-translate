@@ -1,0 +1,23 @@
+[flake8]
+max-line-length = 120
+include =
+    # line break occurred after a binary operator
+    W504
+ignore =
+    # missing whitespace around arithmetic operator
+    E226
+    # module level import not at top of file
+    gcfunction/main.py E402
+    # star imports
+    F401 F403 comic/vis/__init__.py
+    F401 F403 comic/dataset/__init__.py
+exclude =
+    venv,
+    requirements,
+    notebooks,
+    web.
+    .git,
+    .pytest_cache,
+    .cache,
+    .ipynb_checkpoints,
+    *.egg-info

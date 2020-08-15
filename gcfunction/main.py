@@ -1,13 +1,14 @@
-import sys
 import os
+import sys
+
 sys.path.insert(1, os.path.dirname(os.path.realpath(__file__)))
 from google.cloud import storage
-import requests, io, logging
+import io
+import logging
 from PIL import Image
 from comic.models.rcnn import get_model_instance_segmentation
 import torch
 from torchvision.transforms import functional as F
-from pathlib import Path
 from comic.utils.filter import filter_outputs
 from comic.vis.visualize import box2wh
 from flask import jsonify
@@ -33,7 +34,7 @@ if model is None:
 
 
 def detect_text(request):
-    ## Extracting parameter and returning prediction
+    # Extracting parameter and returning prediction
     if request.method == 'OPTIONS':
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
