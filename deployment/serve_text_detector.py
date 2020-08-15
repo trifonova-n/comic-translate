@@ -1,9 +1,13 @@
-import logging, requests, os, io, glob, time
-import torch
-from pathlib import Path
-from PIL import Image
+import io
 import json
+import logging
+import requests
+from pathlib import Path
+
+import torch
+from PIL import Image
 from torchvision.transforms import functional as F
+
 from comic.models.rcnn import get_model_instance_segmentation
 from comic.utils.filter import filter_outputs
 from comic.vis.visualize import box2wh

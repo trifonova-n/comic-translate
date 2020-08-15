@@ -1,9 +1,9 @@
-import sys
+import json
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.utils.data
-import json
-from pathlib import Path
 from PIL import Image
 
 

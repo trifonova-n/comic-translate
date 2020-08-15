@@ -1,24 +1,19 @@
-from fastai.vision import *
-from pathlib import Path
-import torchvision
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection import FasterRCNN
-from torchvision.models.detection.rpn import AnchorGenerator
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+import torch
+
 import comic.training.transforms as T
-from comic.dataset.dataset import ImageTextDataset
-from comic.training.engine import train_one_epoch, evaluate
 import comic.utils
-from comic.vis import draw_annotation, show_image
-from comic.models.rcnn import get_model_instance_segmentation, save_model
+from comic.dataset.dataset import ImageTextDataset
+from comic.models.rcnn import get_model_instance_segmentation
+from comic.training.engine import train_one_epoch, evaluate
 
 
 def get_transform(train):
     transforms = []
     transforms.append(T.ToTensor())
-    #if train:
-    #    transforms.append(T.RandomHorizontalFlip(0.5))
+    # if train:
+    #     transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
+
 
 # train on the GPU or on the CPU, if a GPU is not available
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -74,4 +69,3 @@ for epoch in range(num_epochs):
     evaluate(model, data_loader_test, device=device)
 
 print("That's it!")
-

@@ -10,8 +10,10 @@ import numpy as np
 
 class TextGenerator:
     def __init__(self, text_file):
-        self.text_list = [s.rstrip() for s in Path(text_file).open('r+', encoding="utf-8").readlines()]
-        self.short_text_list = [s.rstrip() for s in (Path(text_file).parent / 'short_replics.txt').open('r+', encoding="utf-8").readlines()]
+        with Path(text_file).open('r+', encoding="utf-8") as f:
+            self.text_list = [s.rstrip() for s in f.readlines()]
+        with (Path(text_file).parent / 'short_replics.txt').open('r+', encoding="utf-8") as f:
+            self.short_text_list = [s.rstrip() for s in f.readlines()]
         self.font_files = []
         self.min_font_size = 14
         self.max_font_size = 60
@@ -64,7 +66,7 @@ class TextGenerator:
             color = (0, 0, 0)
         else:
             color = (255, 255, 255)
-        contour_color = (255 - color[0], 255 - color[0],255 - color[0])
+        contour_color = (255 - color[0], 255 - color[0], 255 - color[0])
         pos = multiline_text(draw, (x, y), text, box_width, box_height=box[3], font=font, place='center', color=color,
                              contour=contour, contour_color=contour_color, spacing=spacing)
         if generate_mask:
@@ -72,7 +74,7 @@ class TextGenerator:
             if mask is None:
                 mask = Image.new("L", draw.im.size, 0)
             mask_draw = ImageDraw.Draw(mask)
-            multiline_text(mask_draw, (x, y), text, box_width, box_height=box[3], font=font, place='center', color=mask_color,
-                           contour=contour, contour_color=mask_color, spacing=spacing)
+            multiline_text(mask_draw, (x, y), text, box_width, box_height=box[3], font=font, place='center',
+                           color=mask_color, contour=contour, contour_color=mask_color, spacing=spacing)
             return mask
         return pos

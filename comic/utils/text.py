@@ -1,8 +1,10 @@
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import string
 
+from PIL import Image, ImageDraw, ImageFilter
 
-def multiline_text(draw, pos, text, box_width, box_height, font, color=0, place='left', contour=0, contour_color=255, spacing=0):
+
+def multiline_text(draw, pos, text, box_width, box_height, font, color=0, place='left',
+                   contour=0, contour_color=255, spacing=0):
     justify_last_line = False
     x, y = pos
     if contour > 0:
