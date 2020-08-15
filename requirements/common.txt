@@ -9,3 +9,4 @@ scikit-image==0.16.2
 Cython==0.29.16
 functions-framework==1.5.0
 pytest==6.0.1
+flake8==3.8.3
