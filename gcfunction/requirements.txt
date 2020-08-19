@@ -1,0 +1,6 @@
+numpy == 1.17
+torch
+torchvision
+Cython
+pycocotools
+google-cloud-storage
