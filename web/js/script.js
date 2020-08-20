@@ -4,6 +4,7 @@
 */
 "use strict";
 
+// Get original image size {width, height} as promise
 function getImageSize(url){
     var img = new Image();
     var promise = new Promise( (resolve, reject) => {
@@ -22,20 +23,21 @@ function getImageSize(url){
     return promise;
 }
 
+// Read file as DataURL promise
 function readAsDataURL(inputFile){
-  var temporaryFileReader = new FileReader();
+    var temporaryFileReader = new FileReader();
 
-  return new Promise((resolve, reject) => {
-    temporaryFileReader.onerror = () => {
-      temporaryFileReader.abort();
-      reject(new DOMException("Problem parsing input file."));
-    };
+    return new Promise((resolve, reject) => {
+        temporaryFileReader.onerror = () => {
+            temporaryFileReader.abort();
+            reject(new DOMException("Problem parsing input file."));
+        };
 
-    temporaryFileReader.onload = () => {
-      resolve(temporaryFileReader.result);
-    };
-    temporaryFileReader.readAsDataURL(inputFile);
-  });
+        temporaryFileReader.onload = () => {
+            resolve(temporaryFileReader.result);
+        };
+        temporaryFileReader.readAsDataURL(inputFile);
+    });
 }
 
 function createObjectURL(object) {
@@ -46,6 +48,7 @@ function revokeObjectURL(url) {
     return (window.URL) ? window.URL.revokeObjectURL(url) : window.webkitURL.revokeObjectURL(url);
 }
 
+// Class for text box on svg image
 class Box{
     constructor(svg, box) {
         this.svg = svg;
@@ -75,6 +78,7 @@ class Box{
 }
 
 
+// Class for svg image with text boxes
 class ImageFrame {
     constructor(){
         this.image_url = null;
@@ -94,7 +98,7 @@ class ImageFrame {
         console.log(this.aspect_ratio);
         this.height = this.width / this.aspect_ratio;
         this.scale_to_local = this.width / this.naturalWidth;
-        this.svg.setAttributeNS(null, 'viewBox', "0 0 " + this.width + " " + this.height);
+        this.svg.setAttributeNS(null, 'viewBox', "0 0 " + this.naturalWidth + " " + this.naturalHeight);
         this.svg.setAttributeNS(null, 'width', this.width);
         this.svg.setAttributeNS(null, 'height', this.height);
 
@@ -110,10 +114,10 @@ class ImageFrame {
 
     add_box(box) {
         var scaled_box = {
-            'left': box.left * this.scale_to_local,
-            'top': box.top * this.scale_to_local,
-            'width': box.width * this.scale_to_local,
-            'height': box.height * this.scale_to_local
+            'left': box.left,
+            'top': box.top,
+            'width': box.width,
+            'height': box.height
         };
         this.boxes.push(new Box(this.svg, scaled_box));
     }
@@ -163,6 +167,7 @@ var imageFrame = null;
 
 fileInput.click();
 
+// Load new Image
 $('#file_input').on('change', function() {
     var file = fileInput.files[0];
 
