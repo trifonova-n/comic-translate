@@ -4,6 +4,48 @@
 */
 "use strict";
 
+function getImageSize(url){
+    var img = new Image();
+    var promise = new Promise( (resolve, reject) => {
+            img.addEventListener("load", function(event){
+                if (event.type == 'load') {
+                    resolve({'width': this.naturalWidth, 'height': this.naturalHeight });
+                }
+                else {
+                    reject("Unuble to get the size of image " + url);
+                }
+            });
+        }
+
+    );
+    img.src = url;
+    return promise;
+}
+
+function readAsDataURL(inputFile){
+  var temporaryFileReader = new FileReader();
+
+  return new Promise((resolve, reject) => {
+    temporaryFileReader.onerror = () => {
+      temporaryFileReader.abort();
+      reject(new DOMException("Problem parsing input file."));
+    };
+
+    temporaryFileReader.onload = () => {
+      resolve(temporaryFileReader.result);
+    };
+    temporaryFileReader.readAsDataURL(inputFile);
+  });
+}
+
+function createObjectURL(object) {
+    return (window.URL) ? window.URL.createObjectURL(object) : window.webkitURL.createObjectURL(object);
+}
+
+function revokeObjectURL(url) {
+    return (window.URL) ? window.URL.revokeObjectURL(url) : window.webkitURL.revokeObjectURL(url);
+}
+
 class Box{
     constructor(svg, box) {
         this.svg = svg;
@@ -32,23 +74,6 @@ class Box{
     }
 }
 
-function getImageSize(url){
-    var img = new Image();
-    var promise = new Promise( (resolve, reject) => {
-            img.addEventListener("load", function(event){
-                if (event.type == 'load') {
-                    resolve({'width': this.naturalWidth, 'height': this.naturalHeight });
-                }
-                else {
-                    reject("Unuble to get the size of image " + url);
-                }
-            });
-        }
-
-    );
-    img.src = url;
-    return promise;
-}
 
 class ImageFrame {
     constructor(){
@@ -68,6 +93,7 @@ class ImageFrame {
         this.aspect_ratio = this.naturalWidth / this.naturalHeight;
         console.log(this.aspect_ratio);
         this.height = this.width / this.aspect_ratio;
+        this.scale_to_local = this.width / this.naturalWidth;
         this.svg.setAttributeNS(null, 'viewBox', "0 0 " + this.width + " " + this.height);
         this.svg.setAttributeNS(null, 'width', this.width);
         this.svg.setAttributeNS(null, 'height', this.height);
@@ -83,7 +109,13 @@ class ImageFrame {
     }
 
     add_box(box) {
-        this.boxes.push(new Box(this.svg, box));
+        var scaled_box = {
+            'left': box.left * this.scale_to_local,
+            'top': box.top * this.scale_to_local,
+            'width': box.width * this.scale_to_local,
+            'height': box.height * this.scale_to_local
+        };
+        this.boxes.push(new Box(this.svg, scaled_box));
     }
 
     clean() {
@@ -94,48 +126,37 @@ class ImageFrame {
     }
 }
 
-function createObjectURL(object) {
-    return (window.URL) ? window.URL.createObjectURL(object) : window.webkitURL.createObjectURL(object);
-}
-
-function revokeObjectURL(url) {
-    return (window.URL) ? window.URL.revokeObjectURL(url) : window.webkitURL.revokeObjectURL(url);
-}
-
 async function processImage() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-        console.log(this.responseText)
+    var xhttp = new XMLHttpRequest();
+    let result;
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText)
+        }
+    };
+    try {
+
+        var dataURL = await readAsDataURL(fileInput.files[0]);
+
+        let result = await $.ajax({
+            url: "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text",
+            type: 'POST',
+            async: true,
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({'image_url': dataURL})
+        });
+
+        Object.entries(result).forEach(([k,v]) => {
+            imageFrame.add_box(v);
+        });
+
+        console.log(result);
+    } catch (e) {
+        console.warn(e.message)
     }
-  };
-  try {
-      xhttp.open("POST", "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text", true);
-
-      xhttp.setRequestHeader("Content-type", "application/json");
-      var dataURL = await readAsDataURL(fileInput.files[0]);
-
-      xhttp.send(JSON.stringify({'image_url': dataURL}));
-  } catch (e) {
-      console.warn(e.message)
-  }
 }
 
-function readAsDataURL(inputFile){
-  var temporaryFileReader = new FileReader();
-
-  return new Promise((resolve, reject) => {
-    temporaryFileReader.onerror = () => {
-      temporaryFileReader.abort();
-      reject(new DOMException("Problem parsing input file."));
-    };
-
-    temporaryFileReader.onload = () => {
-      resolve(temporaryFileReader.result);
-    };
-    temporaryFileReader.readAsDataURL(inputFile);
-  });
-}
 
 var fileInput = document.getElementById("file_input");
 var imageFrame = null;
@@ -146,23 +167,12 @@ $('#file_input').on('change', function() {
     var file = fileInput.files[0];
 
     if (file.name.match(/\.(png|jpg|jpeg)$/)) {
-        /*
-        var reader = new FileReader();
 
-        reader.onload = function() {
-            console.log(reader.result);
-        };
-
-        reader.readAsText(file);
-        */
         if(this.files.length) {
-            var src = createObjectURL(this.files[0]);
+            var src = createObjectURL(file);
 
             imageFrame = new ImageFrame();
             imageFrame.add_image(src)
-
-            // Do whatever you want with your image, it's just like any other image
-            // but it displays directly from the user machine, not the server!
         }
     } else {
         alert("File not supported, .png or .jpg files only");
