@@ -23,7 +23,7 @@ deploy_gcfunction: $(gcf_files)
 	echo "" > $@
 
 deploy_model: requirements.txt
-	gsutil cp model/text_detector.pth gs://comic-translate/models/text_detector.pth
+	gsutil cp data/model/text_detector.pth gs://comic-translate/models/text_detector.pth
 	echo "" > $@
 
 web_files := $(wildcard web/*.html) $(wildcard web/js/*.js)
