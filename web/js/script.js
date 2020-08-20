@@ -131,13 +131,7 @@ class ImageFrame {
 }
 
 async function processImage() {
-    var xhttp = new XMLHttpRequest();
-    let result;
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            console.log(this.responseText)
-        }
-    };
+    let result = null;
     try {
 
         var dataURL = await readAsDataURL(fileInput.files[0]);
