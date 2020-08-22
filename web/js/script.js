@@ -82,14 +82,14 @@ class Box{
 class ImageFrame {
     constructor(){
         this.image_url = null;
-
-        this.width = 800;
         this.svg = document.getElementById('image_field');
+        this.width = image_field.clientWidth;
         console.log(this.svg);
         this.boxes = []
     }
 
     async add_image(image_url) {
+        this.clean();
         var size = await getImageSize(image_url);
         // compute svg image size
         this.naturalWidth = size.width;
@@ -99,16 +99,14 @@ class ImageFrame {
         this.height = this.width / this.aspect_ratio;
         this.scale_to_local = this.width / this.naturalWidth;
         this.svg.setAttributeNS(null, 'viewBox', "0 0 " + this.naturalWidth + " " + this.naturalHeight);
-        this.svg.setAttributeNS(null, 'width', this.width);
-        this.svg.setAttributeNS(null, 'height', this.height);
 
         // Add image element on svg
         this.image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
 
         this.image.setAttributeNS(null, 'href', image_url);
-        this.image.setAttributeNS(null, 'width', this.width);
-
+        this.image.setAttributeNS(null, 'width', this.naturalWidth);
         this.svg.appendChild(this.image);
+
 
     }
 
@@ -123,10 +121,7 @@ class ImageFrame {
     }
 
     clean() {
-        this.svg.removeChild(this.image);
-        for (box of this.boxes) {
-            box.clean();
-        }
+        $("#image_field").empty();
     }
 }
 
