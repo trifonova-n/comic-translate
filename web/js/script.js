@@ -60,6 +60,14 @@ class Box{
         this.box.setAttributeNS(null, 'style', "stroke:yellow;stroke-width:2;fill-opacity:0");
 
         this.svg.appendChild(this.box);
+        this.add_mask(box.mask)
+    }
+
+    add_mask(mask_url) {
+        var mask = document.getElementById('text_mask');
+        this.mask_image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.mask_image.setAttributeNS(null, 'href', mask_url);
+        mask.appendChild(this.mask_image);
     }
 
     move(x, y) {
@@ -106,21 +114,14 @@ class ImageFrame {
         this.image.setAttributeNS(null, 'href', image_url);
         this.image.setAttributeNS(null, 'width', this.naturalWidth);
         this.svg.appendChild(this.image);
-
-
+        this.add_mask();
     }
 
     add_box(box) {
-        var scaled_box = {
-            'left': box.left,
-            'top': box.top,
-            'width': box.width,
-            'height': box.height
-        };
-        this.boxes.push(new Box(this.svg, scaled_box));
+        this.boxes.push(new Box(this.svg, box));
     }
 
-    add_mask(mask_url) {
+    add_mask() {
         this.defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         this.mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
         this.mask.setAttributeNS(null, 'id', 'text_mask');
@@ -133,10 +134,12 @@ class ImageFrame {
         this.mask.appendChild(mask_image);
         */
 
+        /*
         var mask_image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         mask_image.setAttributeNS(null, 'href', mask_url);
         mask_image.setAttributeNS(null, 'width', this.naturalWidth);
         this.mask.appendChild(mask_image);
+        */
 
         this.defs.appendChild(this.mask);
         this.svg.appendChild(this.defs);
@@ -183,8 +186,6 @@ async function processImage() {
         Object.entries(result).forEach(([k,v]) => {
             imageFrame.add_box(v);
         });
-
-        imageFrame.add_mask('https://comic-translate.com/test/text_image.jpg')
 
         console.log(result);
     } catch (e) {

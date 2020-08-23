@@ -33,3 +33,5 @@ deploy_web: $(web_files)
 
 test_gcfunction:
 	gcloud functions call detect_text --data='{"image_url": "http://comic-translate.com/test/text_image.jpg"}'
+# export GOOGLE_APPLICATION_CREDENTIALS="/home/red-haired/programming/comic-translate/comic-translate-f2720103bc48.json"
+# functions-framework --target=detect_text

@@ -38,7 +38,7 @@ def encode_mask(mask):
     with io.BytesIO() as output:
         mask.save(output, format="PNG")
         contents = output.getvalue()
-    return 'data:image/png;base64,' + base64.encodebytes(contents)
+    return 'data:image/png;base64,' + base64.b64encode(contents).decode()
 
 
 def detect_text(request):
