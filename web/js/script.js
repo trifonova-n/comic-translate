@@ -150,7 +150,7 @@ class ImageFrame {
         this.mask_box.setAttributeNS(null, 'y', 0);
         this.mask_box.setAttributeNS(null, 'width', this.naturalWidth);
         this.mask_box.setAttributeNS(null, 'height', this.naturalHeight);
-        this.mask_box.setAttributeNS(null, 'style', "fill:yellow;stroke-width:0;fill-opacity:0.5");
+        this.mask_box.setAttributeNS(null, 'style', "fill:red;stroke-width:0;fill-opacity:1");
         this.mask_box.setAttributeNS(null, 'mask', 'url(#text_mask)');
         this.svg.appendChild(this.mask_box);
 
@@ -173,9 +173,11 @@ async function processImage() {
     try {
 
         var dataURL = await readAsDataURL(fileInput.files[0]);
+        //var server_url = 'http://192.168.1.64:8080';
+        var server_url = "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text";
 
         let result = await $.ajax({
-            url: "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text",
+            url: server_url,
             type: 'POST',
             async: true,
             contentType: "application/json",
