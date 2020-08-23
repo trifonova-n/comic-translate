@@ -22,7 +22,7 @@ deploy_gcfunction: $(gcf_files)
 	--trigger-http --memory=2048
 	echo "" > $@
 
-deploy_model: requirements.txt
+deploy_model:
 	gsutil cp data/model/text_detector.pth gs://comic-translate/models/text_detector.pth
 	echo "" > $@
 

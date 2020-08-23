@@ -34,8 +34,9 @@ if model is None:
 
 
 def encode_mask(mask):
-    mask = F.to_pil_image(mask)
-    mask.putalpha(mask.copy())
+    alpha = F.to_pil_image(mask)
+    mask = Image.new("L", alpha.size, 255)
+    mask.putalpha(alpha)
     with io.BytesIO() as output:
         mask.save(output, format="PNG")
         contents = output.getvalue()
