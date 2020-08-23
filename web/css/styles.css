@@ -2,3 +2,9 @@
 #image_field {
     width: 50%;
 }
+/*
+.masked_text {
+    -webkit-mask-image: url(#text_mask);
+    mask-mode: luminance;
+}
+*/
