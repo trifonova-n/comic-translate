@@ -22,7 +22,7 @@ deploy_gcfunction: $(gcf_files)
 	--trigger-http --memory=2048
 	echo "" > $@
 
-deploy_model: requirements.txt
+deploy_model:
 	gsutil cp data/model/text_detector.pth gs://comic-translate/models/text_detector.pth
 	echo "" > $@
 
@@ -33,3 +33,5 @@ deploy_web: $(web_files)
 
 test_gcfunction:
 	gcloud functions call detect_text --data='{"image_url": "http://comic-translate.com/test/text_image.jpg"}'
+# export GOOGLE_APPLICATION_CREDENTIALS="/home/red-haired/programming/comic-translate/comic-translate-f2720103bc48.json"
+# functions-framework --target=detect_text

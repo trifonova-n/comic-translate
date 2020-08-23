@@ -33,6 +33,16 @@ if model is None:
     model.to(device).eval()
 
 
+def encode_mask(mask):
+    alpha = F.to_pil_image(mask)
+    mask = Image.new("L", alpha.size, 255)
+    mask.putalpha(alpha)
+    with io.BytesIO() as output:
+        mask.save(output, format="PNG")
+        contents = output.getvalue()
+    return 'data:image/png;base64,' + base64.b64encode(contents).decode()
+
+
 def detect_text(request):
     # Extracting parameter and returning prediction
     if request.method == 'OPTIONS':
@@ -80,6 +90,6 @@ def detect_text(request):
             box = [int(p) for p in box.data.numpy()]
             pos = box2wh(box)
             output[i] = {'left': pos[0], 'top': pos[1], 'width': pos[2], 'height': pos[3],
-                         'label': label_map[int(ann['labels'][i])]}
+                         'label': label_map[int(ann['labels'][i])], 'mask': encode_mask(ann['masks'][i])}
 
         return (jsonify(output), 200, headers)

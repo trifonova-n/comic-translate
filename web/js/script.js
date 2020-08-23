@@ -60,6 +60,14 @@ class Box{
         this.box.setAttributeNS(null, 'style', "stroke:yellow;stroke-width:2;fill-opacity:0");
 
         this.svg.appendChild(this.box);
+        this.add_mask(box.mask)
+    }
+
+    add_mask(mask_url) {
+        var mask = document.getElementById('text_mask');
+        this.mask_image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        this.mask_image.setAttributeNS(null, 'href', mask_url);
+        mask.appendChild(this.mask_image);
     }
 
     move(x, y) {
@@ -82,14 +90,14 @@ class Box{
 class ImageFrame {
     constructor(){
         this.image_url = null;
-
-        this.width = 800;
         this.svg = document.getElementById('image_field');
+        this.width = image_field.clientWidth;
         console.log(this.svg);
         this.boxes = []
     }
 
     async add_image(image_url) {
+        this.clean();
         var size = await getImageSize(image_url);
         // compute svg image size
         this.naturalWidth = size.width;
@@ -99,34 +107,41 @@ class ImageFrame {
         this.height = this.width / this.aspect_ratio;
         this.scale_to_local = this.width / this.naturalWidth;
         this.svg.setAttributeNS(null, 'viewBox', "0 0 " + this.naturalWidth + " " + this.naturalHeight);
-        this.svg.setAttributeNS(null, 'width', this.width);
-        this.svg.setAttributeNS(null, 'height', this.height);
 
         // Add image element on svg
         this.image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
 
         this.image.setAttributeNS(null, 'href', image_url);
-        this.image.setAttributeNS(null, 'width', this.width);
-
+        this.image.setAttributeNS(null, 'width', this.naturalWidth);
         this.svg.appendChild(this.image);
-
+        this.add_mask();
     }
 
     add_box(box) {
-        var scaled_box = {
-            'left': box.left,
-            'top': box.top,
-            'width': box.width,
-            'height': box.height
-        };
-        this.boxes.push(new Box(this.svg, scaled_box));
+        this.boxes.push(new Box(this.svg, box));
+    }
+
+    add_mask() {
+        // Add mask node
+        // Individual text masks are added to this node in Box class
+        this.defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        this.mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
+        this.mask.setAttributeNS(null, 'id', 'text_mask');
+        this.defs.appendChild(this.mask);
+        this.svg.appendChild(this.defs);
+
+        this.mask_box = document.createElementNS('http://www.w3.org/2000/svg', "rect");
+        this.mask_box.setAttributeNS(null, 'x', 0);
+        this.mask_box.setAttributeNS(null, 'y', 0);
+        this.mask_box.setAttributeNS(null, 'width', this.naturalWidth);
+        this.mask_box.setAttributeNS(null, 'height', this.naturalHeight);
+        this.mask_box.setAttributeNS(null, 'style', "fill:red;stroke-width:0;fill-opacity:1");
+        this.mask_box.setAttributeNS(null, 'mask', 'url(#text_mask)');
+        this.svg.appendChild(this.mask_box);
     }
 
     clean() {
-        this.svg.removeChild(this.image);
-        for (box of this.boxes) {
-            box.clean();
-        }
+        $("#image_field").empty();
     }
 }
 
@@ -135,9 +150,11 @@ async function processImage() {
     try {
 
         var dataURL = await readAsDataURL(fileInput.files[0]);
+        //var server_url = 'http://192.168.1.64:8080';
+        var server_url = "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text";
 
         let result = await $.ajax({
-            url: "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text",
+            url: server_url,
             type: 'POST',
             async: true,
             contentType: "application/json",
