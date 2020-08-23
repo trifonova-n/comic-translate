@@ -124,11 +124,18 @@ class ImageFrame {
         this.defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         this.mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
         this.mask.setAttributeNS(null, 'id', 'text_mask');
+        /*
         var mask_image = document.createElementNS('http://www.w3.org/2000/svg', "circle");
         mask_image.setAttributeNS(null, 'cx', this.naturalWidth / 2);
         mask_image.setAttributeNS(null, 'cy', this.naturalHeight / 2);
         mask_image.setAttributeNS(null, 'r', this.naturalHeight / 6);
         mask_image.setAttributeNS(null, 'fill', "white");
+        this.mask.appendChild(mask_image);
+        */
+
+        var mask_image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        mask_image.setAttributeNS(null, 'href', mask_url);
+        mask_image.setAttributeNS(null, 'width', this.naturalWidth);
         this.mask.appendChild(mask_image);
 
         this.defs.appendChild(this.mask);
