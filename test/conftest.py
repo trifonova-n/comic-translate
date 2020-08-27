@@ -68,7 +68,7 @@ def localserver(xprocess, request):
     class Starter(ProcessStarter):
         pattern = r"(Booting worker with pid: \d+)|(Traceback)"
         args = [pathlib.Path(sys.executable).parent / 'functions-framework', f'--target={function_name}']
-        env = {'GOOGLE_APPLICATION_CREDENTIALS': os.path.abspath(pathlib.Path(__file__).parent.parent / 'comic-translate-f2720103bc48.json'),
+        env = {'GOOGLE_APPLICATION_CREDENTIALS': os.path.abspath(pathlib.Path(__file__).parent.parent / 'comic-translate-github.json'),
                'LC_ALL': 'en_US.utf-8',
                'LANG': 'en_US.utf-8'}
 
