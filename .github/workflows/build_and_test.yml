@@ -53,4 +53,3 @@ jobs:
         name: functions-framework-log
         path: |
           .xprocess/*/xprocess.log
-          comic-translate-github.json
