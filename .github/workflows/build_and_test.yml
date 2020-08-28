@@ -40,3 +40,9 @@ jobs:
       run: |
         echo $GCLOUD_SECRET > comic-translate-github.json
         pytest
+
+    - name: Archive functions-framework server logs
+      uses: actions/upload-artifact@v2
+      with:
+        name: functions-framework-log
+        path: .xprocess/*/xprocess.log
