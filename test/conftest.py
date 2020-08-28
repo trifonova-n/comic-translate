@@ -72,6 +72,11 @@ def localserver(xprocess, request):
                'LC_ALL': 'en_US.utf-8',
                'LANG': 'en_US.utf-8'}
 
+        def log_line(self, line):
+            line = line.replace('%', '%%')
+            self.process.log.debug(line)
+            return line
+
     logfile = xprocess.ensure(server_name, Starter)[1]
     #logfile = open(logfile, 'r')
     #error_data = os.read(logfile.fileno(), 20000)
