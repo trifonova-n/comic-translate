@@ -42,6 +42,7 @@ jobs:
         pytest
 
     - name: Archive functions-framework server logs
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v2
       with:
         name: functions-framework-log
