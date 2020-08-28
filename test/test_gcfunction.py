@@ -1,12 +1,7 @@
-from pathlib import Path
-import shutil
-import comic.config as config
-import subprocess
 import base64
 import os
 import requests
 import re
-import pytest
 
 
 def test_gcfunction_local(xprocess, localserver, nakaguma_image_path):
@@ -15,12 +10,6 @@ def test_gcfunction_local(xprocess, localserver, nakaguma_image_path):
 
     # Send HTTP request simulating Pub/Sub message
     # (GCF translates Pub/Sub messages to HTTP requests internally)
-    BASE_URL = os.getenv('BASE_URL')
-
-    #retry_policy = Retry(total=6, backoff_factor=1)
-    #retry_adapter = requests.adapters.HTTPAdapter(
-    #    max_retries=retry_policy)
-
     res = requests.post(
         'http://127.0.0.1:8080',
         json={'image_url': dataurl}

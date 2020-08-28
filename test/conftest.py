@@ -77,10 +77,5 @@ def localserver(xprocess, request):
             self.process.log.debug(line)
             return line
 
-    logfile = xprocess.ensure(server_name, Starter)[1]
-    #logfile = open(logfile, 'r')
-    #error_data = os.read(logfile.fileno(), 20000)
-    #print(error_data.decode("utf-8"))
-    #if len(error_data) > 10:
-    #    raise Exception(error_data)
+    xprocess.ensure(server_name, Starter)
     return server_name
