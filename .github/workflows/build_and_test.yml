@@ -39,7 +39,7 @@ jobs:
 
     - name: create google cloud authorization file
       env:
-        GCLOUD_SECRET: ${{ secrets.$GCLOUD_SECRET }}
+        GCLOUD_SECRET: ${{ secrets.GCLOUD_SECRET }}
       run: |
         echo "$GCLOUD_SECRET" > comic-translate-github.json
     - name: Test with pytest
