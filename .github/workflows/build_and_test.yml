@@ -39,6 +39,7 @@ jobs:
     - name: Test with pytest
       run: |
         echo $GCLOUD_SECRET > comic-translate-github.json
+        cat comic-translate-github.json
         pytest
 
     - name: Archive functions-framework server logs
