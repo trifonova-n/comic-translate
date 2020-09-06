@@ -17,15 +17,6 @@ html, body {
 #image_field {
     width: 50%;
 }
-/*
-.masked_text {
-    -webkit-mask-image: url(#text_mask);
-    mask-mode: luminance;
-}
-*/
-
-
-
 
 .loading_splash {
 position: fixed;
@@ -33,7 +24,7 @@ width: 100%;
 height: 100%;
 top: 0;
 left: 0;
-background-color: #0003;
+background-color: #ffffffa8;
 display: none;
 align-items: center;
 justify-content: center;
@@ -43,6 +34,6 @@ justify-content: center;
     display: flex;
 }
 .loading_splash img{
-    height: 40%;
+    height: 10%;
     width: auto;
 }

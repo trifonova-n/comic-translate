@@ -136,7 +136,7 @@ class ImageFrame {
         this.mask_box.setAttributeNS(null, 'width', this.naturalWidth);
         this.mask_box.setAttributeNS(null, 'height', this.naturalHeight);
         this.mask_box.setAttributeNS(null, 'style', "fill:red;stroke-width:0;fill-opacity:1");
-
+        this.mask_box.setAttributeNS(null, 'mask', 'url(#text_mask)');
         this.svg.appendChild(this.mask_box);
     }
 
