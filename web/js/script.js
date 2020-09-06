@@ -153,13 +153,22 @@ async function processImage() {
         //var server_url = 'http://192.168.1.64:8080';
         var server_url = "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text";
 
+        var OnBeginStuff = function() {
+            $(".loading_splash").addClass('visible');
+        }
+        var OnCompleteStuff = function() {
+            $(".loading_splash").removeClass('visible');
+        }
+
         let result = await $.ajax({
             url: server_url,
             type: 'POST',
             async: true,
             contentType: "application/json",
             dataType: "json",
-            data: JSON.stringify({'image_url': dataURL})
+            data: JSON.stringify({'image_url': dataURL}),
+            beforeSend: OnBeginStuff,
+            complete: OnCompleteStuff,
         });
 
         Object.entries(result).forEach(([k,v]) => {
