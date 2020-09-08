@@ -1,5 +1,5 @@
 
-deploy: deploy_gcfunction deploy_model deploy_web test_gcfunction
+deploy: deploy_gcfunction deploy_model deploy_web
 
 gcf_files := $(wildcard comic/*.py) $(wildcard comic/models/*.py) $(wildcard comic/utils/*.py) \
 $(wildcard comic/vis/*.py) $(wildcard gcfunction/*.py) $(wildcard gcfunction/*.txt)
@@ -30,8 +30,3 @@ web_files := $(wildcard web/*.html) $(wildcard web/js/*.js)
 deploy_web: $(web_files)
 	gsutil cp -r web/* gs://comic-translate.com
 	echo "" > $@
-
-test_gcfunction:
-	gcloud functions call detect_text --data='{"image_url": "http://comic-translate.com/test/text_image.jpg"}'
-# export GOOGLE_APPLICATION_CREDENTIALS="/home/red-haired/programming/comic-translate/comic-translate-f2720103bc48.json"
-# functions-framework --target=detect_text

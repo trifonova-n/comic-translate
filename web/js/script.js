@@ -117,6 +117,17 @@ class ImageFrame {
         this.add_mask();
     }
 
+    add_background(image_url) {
+        // Add image element on svg
+        this.background = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+
+        this.background.setAttributeNS(null, 'href', image_url);
+        this.background.setAttributeNS(null, 'width', this.naturalWidth);
+        this.background.setAttributeNS(null, 'height', this.naturalHeight);
+        this.background.setAttributeNS(null, 'mask', 'url(#text_mask)');
+        this.svg.appendChild(this.background);
+    }
+
     add_box(box) {
         this.boxes.push(new Box(this.svg, box));
     }
@@ -129,15 +140,6 @@ class ImageFrame {
         this.mask.setAttributeNS(null, 'id', 'text_mask');
         this.defs.appendChild(this.mask);
         this.svg.appendChild(this.defs);
-
-        this.mask_box = document.createElementNS('http://www.w3.org/2000/svg', "rect");
-        this.mask_box.setAttributeNS(null, 'x', 0);
-        this.mask_box.setAttributeNS(null, 'y', 0);
-        this.mask_box.setAttributeNS(null, 'width', this.naturalWidth);
-        this.mask_box.setAttributeNS(null, 'height', this.naturalHeight);
-        this.mask_box.setAttributeNS(null, 'style', "fill:red;stroke-width:0;fill-opacity:1");
-        this.mask_box.setAttributeNS(null, 'mask', 'url(#text_mask)');
-        this.svg.appendChild(this.mask_box);
     }
 
     clean() {
@@ -150,15 +152,15 @@ async function processImage() {
     try {
 
         var dataURL = await readAsDataURL(fileInput.files[0]);
-        //var server_url = 'http://192.168.1.64:8080';
-        var server_url = "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text";
+        var server_url = 'http://192.168.1.64:8080';
+        //var server_url = "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text";
 
         var OnBeginStuff = function() {
             $(".loading_splash").addClass('visible');
-        }
+        };
         var OnCompleteStuff = function() {
             $(".loading_splash").removeClass('visible');
-        }
+        };
 
         let result = await $.ajax({
             url: server_url,
@@ -171,11 +173,14 @@ async function processImage() {
             complete: OnCompleteStuff,
         });
 
-        Object.entries(result).forEach(([k,v]) => {
+        imageFrame.add_background(result.background);
+        var boxes = result['boxes'];
+        Object.entries(boxes).forEach(([k,v]) => {
             imageFrame.add_box(v);
         });
 
         console.log(result);
+
     } catch (e) {
         console.warn(e.message)
     }
