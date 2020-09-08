@@ -152,8 +152,8 @@ async function processImage() {
     try {
 
         var dataURL = await readAsDataURL(fileInput.files[0]);
-        var server_url = 'http://192.168.1.64:8080';
-        //var server_url = "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text";
+        //var server_url = 'http://192.168.1.64:8080';
+        var server_url = "https://us-central1-comic-translate-284120.cloudfunctions.net/detect_text";
 
         var OnBeginStuff = function() {
             $(".loading_splash").addClass('visible');
