@@ -10,11 +10,15 @@ from comic.models.rcnn import get_model_instance_segmentation
 import torch
 from torchvision.transforms import functional as F
 from comic.utils.filter import filter_outputs
-from comic.vis.visualize import box2wh
 from flask import jsonify
 import base64
-import cv2
-import numpy as np
+#import numpy
+#from scipy.ndimage.morphology import binary_dilation
+
+def box2wh(box):
+    xmin, ymin, xmax, ymax = box
+    return xmin, ymin, xmax - xmin, ymax - ymin
+
 
 model = None
 device = torch.device('cpu')
@@ -43,10 +47,9 @@ def encode_image(image):
 
 
 def tweak_mask(mask):
-    mask = 1.0 * (mask.data.cpu().numpy() > 0.1)
-    kernel = np.ones((9, 9), np.uint8)
-    mask = cv2.dilate(mask[0, ...], kernel, iterations=1)
-    return torch.Tensor(mask)
+    #kernel = numpy.ones((9, 9))
+    #mask = binary_dilation(mask, kernel)
+    return 1.0*(mask > 0.1)
 
 
 def encode_mask(mask):
@@ -56,11 +59,11 @@ def encode_mask(mask):
     return encode_image(mask)
 
 
-def inpainting(image, annotation):
-    new_image = image.copy()
-    draw = ImageDraw.Draw(new_image)
-    for k, mask in enumerate(annotation['masks']):
-        draw.bitmap((0, 0), F.to_pil_image(mask), fill=(255, 255, 255))
+def inpainting(image_size, annotation):
+    new_image = Image.new("RGB", image_size, (255, 255, 255))
+    #draw = ImageDraw.Draw(new_image)
+    #for k, mask in enumerate(annotation['masks']):
+    #    draw.bitmap((0, 0), F.to_pil_image(mask), fill=(255, 255, 255))
     return encode_image(new_image)
 
 
@@ -95,28 +98,30 @@ def detect_text(request):
         body = base64.decodebytes(image_encoded.encode('utf-8'))
 
         image = Image.open(io.BytesIO(body))
-        image_tensor = F.to_tensor(image)
+        image_size = image.size
+        image = F.to_tensor(image)
 
         logger.info("Calling model")
         with torch.no_grad():
             model.eval()
-            out = model(image_tensor[None, ...])
+            out = model(image[None, ...])
         prediction = filter_outputs(out)
+        del out
 
         logger.info('Serializing the generated output.')
         ann = prediction[0]
+        del prediction
         label_map = {1: 'bubble', 2: 'text'}
         boxes = {}
         for i, box in enumerate(ann['boxes']):
             box = [int(p) for p in box.data.numpy()]
             pos = box2wh(box)
-            ann['masks'][i] = tweak_mask(ann['masks'][i])
             boxes[i] = {'left': pos[0], 'top': pos[1], 'width': pos[2], 'height': pos[3],
                          'label': label_map[int(ann['labels'][i])], 'mask': encode_mask(ann['masks'][i])}
 
         output = {}
         output['boxes'] = boxes
-        output['background'] = inpainting(image, ann)
+        output['background'] = inpainting(image_size, ann)
 
         return (jsonify(output), 200, headers)
 

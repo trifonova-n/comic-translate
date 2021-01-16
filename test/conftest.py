@@ -66,17 +66,22 @@ def copy_gcfunction_files(deployment_dir):
     shutil.copytree(project_dir / 'gcfunction', deployment_dir)
     shutil.copytree(project_dir / 'comic',
                     deployment_dir / 'comic',
-                    ignore=shutil.ignore_patterns('comic/dataset/*', 'comic/training/*'))
+                    ignore=shutil.ignore_patterns('comic/dataset/*', 'comic/training/*', 'comic/vis/*'))
+    os.system(f'{pathlib.Path(sys.executable)} -m venv {deployment_dir}/test_env'
+              f' && . {deployment_dir}/test_env/bin/activate && pip install --no-cache-dir -r {deployment_dir}/requirements.txt'
+              f' && pip install functions-framework==1.5.0')
+
 
 @pytest.fixture
 def localserver(xprocess, project_path, request):
     function_name = getattr(request, 'param', 'detect_text')
     server_name = "localserver_" + function_name
-    copy_gcfunction_files(xprocess.rootdir / server_name)
+    deployment_dir = xprocess.rootdir / server_name
+    copy_gcfunction_files(deployment_dir)
 
     class Starter(ProcessStarter):
         pattern = r"(Booting worker with pid: \d+)|(Traceback)"
-        args = [pathlib.Path(sys.executable).parent / 'functions-framework', f'--target={function_name}']
+        args = [deployment_dir / 'test_env/bin/functions-framework', f'--target={function_name}']
         env = {'GOOGLE_APPLICATION_CREDENTIALS': str(project_path / 'comic-translate-github.json'),
                'LC_ALL': 'en_US.utf-8',
                'LANG': 'en_US.utf-8'}

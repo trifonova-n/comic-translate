@@ -1,6 +1,6 @@
 numpy==1.17
-torch==1.4.0
-torchvision==0.5.0
+torch==1.6.0+cu101
+torchvision==0.7.0+cu101
 fastai==1.0.60
 jupyter==1.0.0
 opencv-python==4.2.0.34

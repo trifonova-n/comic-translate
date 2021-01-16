@@ -10,11 +10,9 @@ deploy_gcfunction: $(gcf_files)
 	mkdir deployed/comic
 	mkdir deployed/comic/models
 	mkdir deployed/comic/utils
-	mkdir deployed/comic/vis
 	cp comic/*.py deployed/comic/
 	cp comic/models/*.py deployed/comic/models/
 	cp comic/utils/*.py deployed/comic/utils/
-	cp comic/vis/*.py deployed/comic/vis/
 	cp gcfunction/*.py deployed/
 	cp gcfunction/*.txt deployed/
 
